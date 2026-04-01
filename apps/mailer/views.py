@@ -1,6 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from .models import EmailRecord
 
 from .serializers import BulkEmailSerializer
 from .models import EmailBatch
@@ -25,7 +26,10 @@ class SendBulkEmailAPIView(APIView):
             failed_count=0,
         )
 
-        task = send_bulk_email_task.delay(batch.id, subject, body, emails)
+        records = [EmailRecord(batch=batch, email_address=email) for email in emails]
+        EmailRecord.objects.bulk_create(records, batch_size=1000)
+
+        task = send_bulk_email_task.delay(batch.id)
 
         return Response(
             {

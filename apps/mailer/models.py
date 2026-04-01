@@ -11,3 +11,17 @@ class EmailBatch(models.Model):
 
     def __str__(self):
         return f"Batch {self.id} - {self.subject}"
+
+
+class EmailRecord(models.Model):
+    batch = models.ForeignKey(EmailBatch, on_delete=models.CASCADE, related_name="email_records")
+    email_address = models.EmailField()
+    status = models.BooleanField(
+        null=True,
+        blank=True,
+        default=None,
+        help_text="True=Sent, False=Failed, None=Pending"
+    )
+
+    def __str__(self):
+        return f"{self.email_address} - Batch {self.batch.id}"
