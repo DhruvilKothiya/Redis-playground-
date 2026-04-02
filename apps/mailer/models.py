@@ -1,7 +1,9 @@
 from django.db import models
+from django.conf import settings
 
 
 class EmailBatch(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="email_batches")
     subject = models.CharField(max_length=255)
     body = models.TextField()
     total_recipients = models.PositiveIntegerField(default=0)
