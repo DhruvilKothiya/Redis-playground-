@@ -18,6 +18,7 @@ class SendBulkEmailAPIView(APIView):
 
         # Create batch before queuing
         batch = EmailBatch.objects.create(
+            user=request.user,
             subject=subject,
             body=body,
             total_recipients=len(emails),

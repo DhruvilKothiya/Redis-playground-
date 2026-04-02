@@ -29,9 +29,15 @@ class EmailService:
                         connection=connection,
                     )
                     msg.send(fail_silently=False)
-                    success += 1
-                except Exception:
-                    failed.append(email)
+                    record.status = True
+                    record.save(update_fields=["status"])
+                    success_ids.append(record.id)
+                    print(f"[{index}/{total_records}] Sent successfully\n")
+                except Exception as e:
+                    record.status = False
+                    record.save(update_fields=["status"])
+                    failed_ids.append(record.id)
+                    print(f"[{index}/{total_records}] Failed: {str(e)}\n")
         finally:
             connection.close()
 
