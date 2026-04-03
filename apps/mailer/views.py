@@ -38,6 +38,7 @@ class SendBulkEmailAPIView(APIView):
                 "task_id": task.id,
                 "batch_id": batch.id,
                 "total_recipients": len(emails),
+                "success_count": batch.success_count,
             },
             status=status.HTTP_202_ACCEPTED,
         )
