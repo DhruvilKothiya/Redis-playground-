@@ -1,7 +1,10 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import transaction
+
 from .models import EmailRecord
+
 
 from .serializers import BulkEmailSerializer
 from .models import EmailBatch
@@ -30,12 +33,11 @@ class SendBulkEmailAPIView(APIView):
         records = [EmailRecord(batch=batch, email_address=email) for email in emails]
         EmailRecord.objects.bulk_create(records, batch_size=1000)
 
-        task = send_bulk_email_task.delay(batch.id)
+        transaction.on_commit(lambda: send_bulk_email_task.delay(batch.id))
 
         return Response(
             {
                 "message": "Email batch queued successfully",
-                "task_id": task.id,
                 "batch_id": batch.id,
                 "total_recipients": len(emails),
                 "success_count": batch.success_count,
